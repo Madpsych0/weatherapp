@@ -1,0 +1,74 @@
+{% extends 'weather_app/base.html' %}
+
+{% block title %}About Weather Dashboard{% endblock %}
+
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'weather_app/css/about.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="about-container">
+    <div class="about-header">
+        <h2>About Weather Dashboard</h2>
+    </div>
+    
+        <div class="about-section">
+            <h3>Features</h3>
+            <ul>
+                <li>
+                    <i class="fas fa-cloud-sun"></i>
+                    <div>
+                        <h4>Current Weather</h4>
+                        <p>Get real-time weather updates from WeatherAPI.com of any location</p>
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-calendar-alt"></i>
+                    <div>
+                        <h4>7-Day Forecast</h4>
+                        <p>Shows forecast for a week</p>
+                    </div>
+                </li>
+                <li>
+                    <i class="fas fa-history"></i>
+                    <div>
+                        <h4>Weather History</h4>
+                        <p>Get a complete hourly history of the location with Stats</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+        
+        <div class="about-section">
+            <h3>Technologies Used</h3>
+            <div class="tech-stack">
+                <div class="tech-item">
+                    <img src="https://static.djangoproject.com/img/logos/django-logo-negative.png" alt="Django">
+                    <p>Django 4.2.7</p>
+                </div>
+                <div class="tech-item">
+                    <i class="fab fa-html5"></i>
+                    <p>HTML5</p>
+                </div>
+                <div class="tech-item">
+                    <i class="fab fa-css3-alt"></i>
+                    <p>CSS3</p>
+                </div>
+                <div class="tech-item">
+                    <i class="fab fa-js"></i>
+                    <p>JavaScript</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="about-section">
+            <h3>Contact Us</h3>
+            <div class="contact-info">
+                <p><i class="fas fa-envelope"></i> Email: navaneethforwork@gmail.com</p>
+                <p><i class="fas fa-phone"></i> Phone: +91 12345 67890</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
