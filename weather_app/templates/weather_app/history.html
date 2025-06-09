@@ -1,0 +1,132 @@
+{% extends 'weather_app/base.html' %}
+
+{% block title %}Weather History - {{ location }}{% endblock %}
+
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'weather_app/css/history.css' %}">
+{% endblock %}
+
+{% block search_action %}{% url 'history' %}{% endblock %}
+
+{% block content %}
+<div class="history-container">
+    <div class="history-header">
+        <h2>Weather History for {{ location }}</h2>
+        <form id="history-form" action="{% url 'history' %}" method="get">
+            <input type="hidden" name="location" value="{{ location }}">
+            <div class="date-picker">
+                <label for="date">Select Date:</label>
+                <input type="date" id="date" name="date" value="{{ date }}" max="{{ today_date }}" required>
+                <button type="submit">Get History</button>
+            </div>
+        </form>
+    </div>
+    
+    {% if not date %}
+        <div class="instructions">
+            <p>Please select a date to view historical weather data.</p>
+        </div>
+    {% elif error %}
+        <div class="error-message">
+            <p>Error: {{ error }}</p>
+            <p>Please try another date or location.</p>
+        </div>
+    {% elif history_data %}
+        <div class="history-data">
+            <div class="day-summary">
+                <h3>{{ history_data.forecast.forecastday.0.date|date:"l, F d, Y" }}</h3>
+                <div class="summary-content">
+                    <div class="summary-icon">
+                        <img src="{{ history_data.forecast.forecastday.0.day.condition.icon }}" alt="{{ history_data.forecast.forecastday.0.day.condition.text }}">
+                        <p>{{ history_data.forecast.forecastday.0.day.condition.text }}</p>
+                    </div>
+                    <div class="summary-temps">
+                        <div class="temp-item">
+                            <i class="fas fa-temperature-high"></i>
+                            <p>Max: {{ history_data.forecast.forecastday.0.day.maxtemp_c }}&deg;C</p>
+                        </div>
+                        <div class="temp-item">
+                            <i class="fas fa-temperature-low"></i>
+                            <p>Min: {{ history_data.forecast.forecastday.0.day.mintemp_c }}&deg;C</p>
+                        </div>
+                        <div class="temp-item">
+                            <i class="fas fa-temperature-half"></i>
+                            <p>Avg: {{ history_data.forecast.forecastday.0.day.avgtemp_c }}&deg;C</p>
+                        </div>
+                    </div>
+                    <div class="summary-details">
+                        <div class="detail-item">
+                            <i class="fas fa-umbrella"></i>
+                            <p>Total Precipitation</p>
+                            <p>{{ history_data.forecast.forecastday.0.day.totalprecip_mm }} mm</p>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-wind"></i>
+                            <p>Max Wind</p>
+                            <p>{{ history_data.forecast.forecastday.0.day.maxwind_kph }} km/h</p>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-tint"></i>
+                            <p>Avg Humidity</p>
+                            <p>{{ history_data.forecast.forecastday.0.day.avghumidity }}%</p>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-sun"></i>
+                            <p>UV Index</p>
+                            <p>{{ history_data.forecast.forecastday.0.day.uv }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="hourly-history">
+                <h3>Hourly Data</h3>
+                <div class="hourly-chart">
+                    <canvas id="tempChart"></canvas>
+                </div>
+                <div class="hourly-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Condition</th>
+                                <th>Temp (&deg;C)</th>
+                                <th>Feels Like (&deg;C)</th>
+                                <th>Wind (km/h)</th>
+                                <th>Humidity (%)</th>
+                                <th>Precipitation (mm)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for hour in history_data.forecast.forecastday.0.hour %}
+                            <tr>
+                                <td>{{ hour.time|slice:"-5:" }}</td>
+                                <td>
+                                    <img src="{{ hour.condition.icon }}" alt="{{ hour.condition.text }}" class="small-icon">
+                                    {{ hour.condition.text }}
+                                </td>
+                                <td>{{ hour.temp_c }}</td>
+                                <td>{{ hour.feelslike_c }}</td>
+                                <td>{{ hour.wind_kph }} {{ hour.wind_dir }}</td>
+                                <td>{{ hour.humidity }}</td>
+                                <td>{{ hour.precip_mm }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="history-data-json" style="display: none;">
+            {{ history_data|safe }}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'weather_app/js/history.js' %}"></script>
+{% endblock %}
