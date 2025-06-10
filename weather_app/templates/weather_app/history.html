@@ -7,30 +7,27 @@
 <link rel="stylesheet" href="{% static 'weather_app/css/history.css' %}">
 {% endblock %}
 
-{% block search_action %}{% url 'history' %}{% endblock %}
-
 {% block content %}
 <div class="history-container">
     <div class="history-header">
-        <h2>Weather History for {{ location }}</h2>
-        <form id="history-form" action="{% url 'history' %}" method="get">
-            <input type="hidden" name="location" value="{{ location }}">
-            <div class="date-picker">
-                <label for="date">Select Date:</label>
-                <input type="date" id="date" name="date" value="{{ date }}" max="{{ today_date }}" required>
-                <button type="submit">Get History</button>
-            </div>
-        </form>
+        <h2>Weather History</h2>
+        <div class="search-form">
+            <form id="history-form" action="{% url 'history' %}" method="get" onsubmit="return validateForm()">
+                <input type="text" name="location" id="location" placeholder="Enter location..." value="{{ location }}" required>
+                <input type="date" name="date" id="date" value="{{ date|date:'Y-m-d' }}" required>
+                <button type="submit"><i class="fas fa-search"></i> Search</button>
+            </form>
+            <div id="error-message" class="error-message" style="display: none; color: #dc3545; margin-top: 0.5rem;"></div>
+        </div>
     </div>
     
     {% if not date %}
         <div class="instructions">
-            <p>Please select a date to view historical weather data.</p>
+            <p>Please select both a date and location to view historical weather data.</p>
         </div>
     {% elif error %}
         <div class="error-message">
-            <p>Error: {{ error }}</p>
-            <p>Please try another date or location.</p>
+            <p>{{ error }}</p>
         </div>
     {% elif history_data %}
         <div class="history-data">
@@ -82,9 +79,7 @@
             
             <div class="hourly-history">
                 <h3>Hourly Data</h3>
-                <div class="hourly-chart">
-                    <canvas id="tempChart"></canvas>
-                </div>
+                {% if history_data.forecast.forecastday.0.hour %}
                 <div class="hourly-table">
                     <table>
                         <thead>
@@ -116,6 +111,11 @@
                         </tbody>
                     </table>
                 </div>
+                {% else %}
+                <div class="no-data-message">
+                    <p>No hourly data available for this date.</p>
+                </div>
+                {% endif %}
             </div>
         </div>
         
@@ -129,4 +129,20 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="{% static 'weather_app/js/history.js' %}"></script>
+<script>
+function validateForm() {
+    const location = document.getElementById('location').value;
+    const date = document.getElementById('date').value;
+    const errorDiv = document.getElementById('error-message');
+    
+    if (!location || !date) {
+        errorDiv.style.display = 'block';
+        errorDiv.textContent = 'Please enter both location and date';
+        return false;
+    }
+    
+    errorDiv.style.display = 'none';
+    return true;
+}
+</script>
 {% endblock %}

@@ -27,58 +27,62 @@
             <div class="forecast-day">
                 <div class="day-content">
                     <div class="day-overview">
-                        <div style="display: flex; align-items: center;">
-                            <img src="{{ day.day.condition.icon }}" alt="{{ day.day.condition.text }}">
-                            <div class="temp-range" style="margin-left: 1.5rem;">
-                                <p class="max-temp">{{ day.day.maxtemp_c }}&deg;C</p>
-                                <div class="temp-bar">
-                                    <div class="temp-fill" style="width: 100%;"></div>
+                        <div class="forecast-header">
+                            <div class="weather-info">
+                                <img src="{{ day.day.condition.icon }}" alt="{{ day.day.condition.text }}">
+                                <div class="temp-range">
+                                    <p class="max-temp">{{ day.day.maxtemp_c }}&deg;C</p>
+                                    <p class="min-temp">{{ day.day.mintemp_c }}&deg;C</p>
                                 </div>
-                                <p class="min-temp">{{ day.day.mintemp_c }}&deg;C</p>
+                                <p class="condition">{{ day.day.condition.text }}</p>
                             </div>
-                            <p class="condition" style="margin-left: 1.5rem;">{{ day.day.condition.text }}</p>
-                        </div>
-                        <div class="forecast-date-right">
-                            {{ day.date|date:"M d, Y" }}
-                        </div>
-                    </div>
-                    
-                    <div class="day-details">
-                        <div class="detail-item">
-                            <i class="fas fa-umbrella"></i>
-                            <p>Precipitation</p>
-                            <p>{{ day.day.totalprecip_mm }} mm</p>
-                        </div>
-                        <div class="detail-item">
-                            <i class="fas fa-wind"></i>
-                            <p>Wind</p>
-                            <p>{{ day.day.maxwind_kph }} km/h</p>
-                        </div>
-                        <div class="detail-item">
-                            <i class="fas fa-tint"></i>
-                            <p>Humidity</p>
-                            <p>{{ day.day.avghumidity }}%</p>
-                        </div>
-                        <div class="detail-item">
-                            <i class="fas fa-sun"></i>
-                            <p>UV Index</p>
-                            <p>{{ day.day.uv }}</p>
-                        </div>
-                    </div>
-                    
-                    <div class="hourly-forecast">
-                        <h4>Hourly Forecast</h4>
-                        <div class="hourly-scroll">
-                            {% for hour in day.hour %}
-                            {% if forloop.counter0|divisibleby:3 %}
-                            <div class="hour-item">
-                                <p class="hour">{{ hour.time|slice:"-5:" }}</p>
-                                <img src="{{ hour.condition.icon }}" alt="{{ hour.condition.text }}">
-                                <p class="hour-temp">{{ hour.temp_c }}&deg;C</p>
-                                <p class="hour-condition">{{ hour.condition.text }}</p>
+                            <div class="date-display">
+                                {% if day.date %}
+                                    <span class="day-name">{{ day.date|date:"l" }}</span>
+                                    <span class="full-date">{{ day.date|date:"M d, Y" }}</span>
+                                {% else %}
+                                    <span class="debug-info" style="display: none;">Debug: {{ day }}</span>
+                                {% endif %}
                             </div>
-                            {% endif %}
-                            {% endfor %}
+                        </div>
+                        
+                        <div class="day-details">
+                            <div class="detail-item">
+                                <i class="fas fa-umbrella"></i>
+                                <p>Precipitation</p>
+                                <p>{{ day.day.totalprecip_mm }} mm</p>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-wind"></i>
+                                <p>Wind</p>
+                                <p>{{ day.day.maxwind_kph }} km/h</p>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-tint"></i>
+                                <p>Humidity</p>
+                                <p>{{ day.day.avghumidity }}%</p>
+                            </div>
+                            <div class="detail-item">
+                                <i class="fas fa-sun"></i>
+                                <p>UV Index</p>
+                                <p>{{ day.day.uv }}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="hourly-forecast">
+                            <h4>Hourly Forecast</h4>
+                            <div class="hourly-scroll">
+                                {% for hour in day.hour %}
+                                {% if forloop.counter0|divisibleby:3 %}
+                                <div class="hour-item">
+                                    <p class="hour">{{ hour.time|slice:"-5:" }}</p>
+                                    <img src="{{ hour.condition.icon }}" alt="{{ hour.condition.text }}">
+                                    <p class="hour-temp">{{ hour.temp_c }}&deg;C</p>
+                                    <p class="hour-condition">{{ hour.condition.text }}</p>
+                                </div>
+                                {% endif %}
+                                {% endfor %}
+                            </div>
                         </div>
                     </div>
                 </div>

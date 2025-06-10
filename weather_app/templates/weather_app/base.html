@@ -21,12 +21,14 @@
                     <li><a href="{% url 'history' %}" class="{% if 'history' in request.path %}active{% endif %}">History</a></li>
                     <li><a href="{% url 'about' %}" class="{% if 'about' in request.path %}active{% endif %}">About</a></li>
                 </ul>
+                {% if 'history' not in request.path and 'about' not in request.path %}
                 <div class="search-container">
                     <form id="search-form" action="{% url 'forecast' %}" method="get">
                         <input type="text" name="location" id="location" placeholder="Search location..." value="{{ location }}">
                         <button type="submit"><i class="fas fa-search"></i></button>
                     </form>
                 </div>
+                {% endif %}
             </nav>
         </header>
         

@@ -35,58 +35,69 @@ def get_weather_data(location):
         }
 
 def forecast(request):
-    """Detailed forecast view"""
-    default_location = "Kottayam"
-    location = request.GET.get('location', default_location)
-    
-    # Get 7-day forecast
-    api_key = settings.WEATHER_API_KEY
-    forecast_url = f"https://api.weatherapi.com/v1/forecast.json?key={api_key}&q={location}&days=7&aqi=no&alerts=yes"
-    
     try:
-        forecast_response = requests.get(forecast_url)
-        forecast_data = forecast_response.json()
-        error = None
+        api_key = settings.WEATHER_API_KEY
+        location = request.GET.get('location', 'Kottayam')
+        # Add days=7 parameter to get 7-day forecast
+        forecast_url = f"https://api.weatherapi.com/v1/forecast.json?key={api_key}&q={location}&days=7&aqi=no"
+        response = requests.get(forecast_url)
+        
+        if response.status_code == 200:
+            forecast_data = response.json()            
+            if 'forecast' in forecast_data and 'forecastday' in forecast_data['forecast']:
+                for day in forecast_data['forecast']['forecastday']:
+                    pass  # Removed debug print
+                return render(request, 'weather_app/forecast.html', {
+                    'forecast_data': forecast_data,
+                    'location': location
+                })
+            else:
+                error = "Invalid forecast data structure"
+        else:
+            error = f"Unable to fetch forecast data: {response.status_code}"
+            
     except Exception as e:
-        forecast_data = None
         error = str(e)
     
-    context = {
-        'forecast_data': forecast_data,
-        'location': location,
+    return render(request, 'weather_app/forecast.html', {
         'error': error,
-    }
-    
-    return render(request, 'weather_app/forecast.html', context)
+        'location': location
+    })
 
 def history(request):
     """Weather history view"""
     default_location = "Kottayam"
     location = request.GET.get('location', default_location)
-    date = request.GET.get('date', '')
+    date = request.GET.get('date')
     
-    history_data = None
-    error = None
+    if not date:
+        return render(request, 'weather_app/history.html', {
+            'location': location
+        })
     
-    if date:
-        # Get historical weather data
+    try:
         api_key = settings.WEATHER_API_KEY
         history_url = f"https://api.weatherapi.com/v1/history.json?key={api_key}&q={location}&dt={date}"
+        response = requests.get(history_url)
         
-        try:
-            history_response = requests.get(history_url)
-            history_data = history_response.json()
-        except Exception as e:
-            error = str(e)
+        if response.status_code == 200:
+            history_data = response.json()
+            return render(request, 'weather_app/history.html', {
+                'location': location,
+                'date': date,
+                'history_data': history_data
+            })
+        else:
+            error = "Unable to fetch weather data the following data might be deleted from server or not forecasted yet. Please try again."
+            
+    except Exception as e:
+        error = str(e)
     
-    context = {
-        'history_data': history_data,
+    return render(request, 'weather_app/history.html', {
         'location': location,
         'date': date,
-        'error': error,
-    }
-    
-    return render(request, 'weather_app/history.html', context)
+        'error': error
+    })
 
 def about(request):
     """About page view"""
